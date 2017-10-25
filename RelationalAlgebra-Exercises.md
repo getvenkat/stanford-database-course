@@ -1,4 +1,16 @@
-# Q4 Find all pizzerias that serve at least one pizza for less than \$10 that both Amy and Fay eat. 
+# Q1. Find all pizzas eaten by at least one female over the age of 20.
+
+    \project_{pizza} (\select_{age >20 and gender='female'} Person \join Eats);
+
+# Q2. Find the names of all females who eat at least one pizza served by Straw Hat. (Note: The pizza need not be eaten at Straw Hat.)
+
+    \project_{name} ( \select_{gender='female' and pizzeria='Straw Hat'} (Person \join Eats \join Serves));
+
+# Q3. Find all pizzerias that serve at least one pizza for less than \$10 that either Amy or Fay (or both) eat. 
+
+    \project_{pizzeria} ( \select_{ (name='Amy' or name='Fay') and price<10 } (Person \join Eats \join Serves));
+
+# Q4. Find all pizzerias that serve at least one pizza for less than \$10 that both Amy and Fay eat. 
 
     \project_{pizzeria} (
     \project_{pizza,pizzeria}( \select_{ (name='Amy' and price<10) } (Person \join Eats \join Serves) )
@@ -6,7 +18,7 @@
     \project_{pizza,pizzeria}( \select_{ (name='Fay' and price<10) } (Person \join Eats \join Serves) )
     );
 
-# Q5 Find the names of all people who eat at least one pizza served by Dominos but who do not frequent Dominos. 
+# Q5. Find the names of all people who eat at least one pizza served by Dominos but who do not frequent Dominos. 
 
     \project_{name} \select_{pizzeria='Dominos'}  (Person \join Eats \join Serves)
      \diff
@@ -62,25 +74,15 @@
 # Q9. Find all pizzerias that serve every pizza eaten by people over 30. 
 // (This query is very challenging; extra congratulations if you get it right.)
 
+(\project_{pizzeria}Serves) 
 
-    \project_{pizzeria} (
-        //Find pizzas eaten by people over 30
-        \project_{pizza} (\select_{age > 30} (Person \join Eats))
-         \join
-        Serves
-    )
-    ;
-    /*
-    \diff
+\diff 
 
-    \project_{pizzeria} (
-    (
-        // Rest of the pizza
-        \project_{pizza} Eats
-          \diff
-        \project_{pizza} (\select_{age > 30} (Person \join Eats))
-        )
-         \join
-        Serves
-    ) ;
-    */
+(\project_{pizzeria} (
+  (\project_{pizzeria} Serves) 
+    \cross 
+  (\project_{pizza}(\select_{age>30}Person \join Eats)) 
+  \diff 
+  (\project_{pizzeria,pizza} (
+  (\select_{age>30}Person \join Eats) \join Serves)))
+);
